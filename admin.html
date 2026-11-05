@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administração — Formatura</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:light dark}body{margin:0;background:#f5f5f3;color:#202020}.wrap{max-width:850px;margin:35px auto;padding:16px}.card{background:white;border:1px solid #ddd;border-radius:14px;padding:22px;margin-bottom:16px}h1{font-size:24px}input,button{font:inherit;padding:12px;border-radius:8px;box-sizing:border-box}input{width:100%;border:1px solid #aaa;margin:7px 0 12px}button{background:#176b43;color:white;border:0;cursor:pointer;margin:5px 5px 5px 0}button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#555}.hidden{display:none}.stats{display:flex;flex-wrap:wrap;gap:10px}.stat{padding:12px;background:#edf5ef;border-radius:8px}#status{white-space:pre-wrap;color:#6b3c00}table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid #ddd;padding:8px;text-align:left}.tablewrap{max-height:440px;overflow:auto}body{color-scheme:light}
+</style>
+</head>
+<body><main class="wrap"><h1>Relatório de cadeiras — Formatura</h1>
+<section id="login" class="card"><h2>Acesso administrativo</h2><label>E-mail<input id="email" type="email" autocomplete="username"></label><label>Senha<input id="password" type="password" autocomplete="current-password"></label><button id="enter">Entrar</button><p>Somente a conta administrativa autorizada pode usar esta página.</p></section>
+<section id="panel" class="card hidden"><button id="logout" class="secondary">Sair</button><h2>Relatório completo</h2><div id="stats" class="stats"></div><p><button id="download" disabled>Baixar relatório CSV (Excel)</button></p><p>O arquivo contém cadeiras de pais (1–130) e convidados (147–1050), inclusive as livres. Homenageados não entram.</p><div class="tablewrap"><table><thead><tr><th>Cadeira</th><th>Setor</th><th>Bloco</th><th>Fileira</th><th>Situação</th><th>Formando</th></tr></thead><tbody id="preview"></tbody></table></div></section><p id="status" role="status"></p></main>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+import {getFirestore,collection,getDocs} from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js';
+const app=initializeApp({apiKey:'AIzaSyDvo0w0cX6kP4vwuCrqRE2oxx6xKj5hJUM',authDomain:'formatura-53-cadeiras.firebaseapp.com',projectId:'formatura-53-cadeiras',storageBucket:'formatura-53-cadeiras.firebasestorage.app',messagingSenderId:'594203584910',appId:'1:594203584910:web:3b2e2e930d5f7ef0b45cdf'});
+const ADMIN_UID='59epyTFaijh7LsYHDsUMVrWllun2';
+const auth=getAuth(app),db=getFirestore(app),$=s=>document.querySelector(s);let rows=[];
+const status=t=>$('#status').textContent=t;
+const csvValue=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+const setView=admin=>{$('#login').classList.toggle('hidden',admin);$('#panel').classList.toggle('hidden',!admin);if(!admin){rows=[];$('#preview').replaceChildren();$('#stats').replaceChildren();$('#download').disabled=true}};
+function buildRows(reservas){const result=[];for(let n=1;n<=1050;n++){if(n>=131&&n<=146)continue;const pais=n<=130,bloco=pais?'':Math.floor((n-147)/226)+1,fileira=pais?Math.floor((n-1)/30)+2:Math.min(15,Math.floor(((n-147)%226)/15)+1),r=reservas.get(n);result.push({n,setor:pais?'Pais':'Convidados',bloco,fileira,situacao:r?'Reservada':'Livre',nome:r?.nome||''})}return result}
+async function load(){status('Carregando reservas...');$('#download').disabled=true;try{const snapshot=await getDocs(collection(db,'seats'));if(auth.currentUser?.uid!==ADMIN_UID)return;const reservas=new Map(snapshot.docs.map(d=>[Number(d.id),d.data()]));rows=buildRows(reservas);const ocupadas=rows.filter(r=>r.situacao==='Reservada').length;$('#stats').replaceChildren();for(const s of [`Total: ${rows.length}`,`Reservadas: ${ocupadas}`,`Livres: ${rows.length-ocupadas}`]){const d=document.createElement('span');d.className='stat';d.textContent=s;$('#stats').append(d)}const tbody=$('#preview');tbody.replaceChildren();for(const r of rows.slice(0,100)){const tr=document.createElement('tr');for(const v of [r.n,r.setor,r.bloco,r.fileira,r.situacao,r.nome]){const td=document.createElement('td');td.textContent=v;tr.append(td)}tbody.append(tr)}$('#download').disabled=false;status('Relatório pronto. Prévia das primeiras 100 cadeiras; o arquivo inclui todas.')}catch(e){status('Não foi possível carregar as reservas: '+e.message)}}
+$('#enter').addEventListener('click',async()=>{status('Entrando...');try{const cred=await signInWithEmailAndPassword(auth,$('#email').value.trim(),$('#password').value);if(cred.user.uid!==ADMIN_UID){await signOut(auth);status('Esta conta não tem permissão administrativa.')}}catch(e){status('Não foi possível entrar. Confira o e-mail e a senha.')}});
+$('#logout').addEventListener('click',()=>signOut(auth));
+onAuthStateChanged(auth,u=>{const ok=!!u&&u.uid===ADMIN_UID;setView(ok);if(ok)load();else if(u){signOut(auth);status('Conta não autorizada.')}else if(!$('#status').textContent)status('Entre com sua conta administrativa.')});
+$('#download').addEventListener('click',()=>{if(auth.currentUser?.uid!==ADMIN_UID||!rows.length)return;const header=['Cadeira','Setor','Bloco','Fileira','Situação','Formando'];const lines=[header,...rows.map(r=>[r.n,r.setor,r.bloco,r.fileira,r.situacao,r.nome])];const content='\ufeff'+lines.map(line=>line.map(csvValue).join(';')).join('\r\n');const blob=new Blob([content],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='relatorio-cadeiras-formatura.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)});
+</script></body></html>
