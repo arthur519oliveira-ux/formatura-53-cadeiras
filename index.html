@@ -53,7 +53,7 @@ input{width:100%;box-sizing:border-box;padding:10px 12px;font:inherit;border:1px
   <input id="nome" autocomplete="off" placeholder="Nome completo do formando">
   <div class="cnt">
     <span class="pill" id="cp">Pais: <b>0</b>/2</span>
-    <span class="pill" id="cc">Convidados: <b>0</b>/11</span>
+    <span class="pill" id="cc">Convidados: <b>0</b>/13</span>
   </div>
   <div id="mine"></div>
   <div id="msg">Carregando…</div>
@@ -81,7 +81,7 @@ import {getFirestore,collection,doc,onSnapshot,runTransaction} from "https://www
 import {getAuth,signInAnonymously,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 const app=initializeApp({apiKey:"AIzaSyDvo0w0cX6kP4vwuCrqRE2oxx6xKj5hJUM",authDomain:"formatura-53-cadeiras.firebaseapp.com",projectId:"formatura-53-cadeiras",storageBucket:"formatura-53-cadeiras.firebasestorage.app",messagingSenderId:"594203584910",appId:"1:594203584910:web:3b2e2e930d5f7ef0b45cdf"});
 const db=getFirestore(app),auth=getAuth(app),seats=collection(db,'seats');
-const LIM={p:2,c:11},els=new Map(),info=new Map();
+const LIM={p:2,c:13},els=new Map(),info=new Map();
 let taken=new Map(),user=null,ready=false,busy=false;
 const $=s=>document.querySelector(s);
 const keyOf=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
