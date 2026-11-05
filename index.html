@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Escolha de cadeiras — Formatura</title>
+<style>
+:root{--bg:#f6f5f1;--fg:#1d1d1b;--mut:#6b6a64;--card:#fff;--bd:#d9d6cc;--free:#e4efe6;--freeb:#7fae88;--mine:#1f6f43;--minefg:#fff;--taken:#cfcac0;--takenfg:#8a867b;--hon:#7b4bb7;--honfg:#fff;--sel:#d9822b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#17171a;--fg:#ecebe6;--mut:#a09e95;--card:#222226;--bd:#3a3a40;--free:#243629;--freeb:#4f8a5b;--mine:#3aa56b;--taken:#3d3d42;--takenfg:#7d7b74;--hon:#8f62cc}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#17171a;--fg:#ecebe6;--mut:#a09e95;--card:#222226;--bd:#3a3a40;--free:#243629;--freeb:#4f8a5b;--mine:#3aa56b;--taken:#3d3d42;--takenfg:#7d7b74;--hon:#8f62cc}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:21px;margin:4px 0 2px}h2{font-size:16px;margin:22px 0 8px}
+.sub{color:var(--mut);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+label{font-weight:600;display:block;margin-bottom:6px}
+input{width:100%;box-sizing:border-box;padding:10px 12px;font:inherit;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg)}
+.cnt{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid var(--bd);font-size:13px}
+.pill b{font-variant-numeric:tabular-nums}.full{border-color:var(--sel);color:var(--sel)}
+#msg{min-height:20px;margin-top:8px;font-size:13px;color:var(--sel)}
+#mine{font-size:13px;color:var(--mut);margin-top:6px;word-break:break-word}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mut)}
+.leg i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+.scroll{overflow-x:auto;padding-bottom:6px}
+.stage{text-align:center;font-weight:700;letter-spacing:6px;padding:10px;border-radius:8px;background:var(--bd);margin:0 auto 12px;min-width:640px}
+.row{display:flex;align-items:center;gap:2px;margin-bottom:2px;width:max-content;margin-inline:auto}
+.rl{width:18px;font-size:10px;color:var(--mut);text-align:center;flex:none}
+.aisle{width:34px;flex:none}
+.half{display:flex;gap:2px;min-width:0}
+.half.l{justify-content:flex-end}
+#front .half{width:388px}
+.s{width:24px;height:24px;flex:none;padding:0;border:1px solid var(--freeb);background:var(--free);color:var(--fg);border-radius:5px;font:inherit;font-size:8px;cursor:pointer}
+.s.t{background:var(--taken);border-color:var(--taken);color:var(--takenfg);cursor:not-allowed}
+.s.m{background:var(--mine);border-color:var(--mine);color:var(--minefg)}
+.s.h{background:var(--hon);border-color:var(--hon);color:var(--honfg);cursor:not-allowed}
+.s.sp{visibility:hidden}
+.blocks{display:grid;grid-template-columns:auto auto;gap:22px 38px;justify-content:center;width:max-content;margin:0 auto}
+.bt{text-align:center;font-weight:600;font-size:13px;margin-bottom:4px}
+.sec-note{font-size:12px;color:var(--mut);margin:-4px 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Escolha de cadeiras</h1>
+<p class="sub">Informe o nome do formando e toque nas cadeiras livres para reservar. Toque em uma cadeira sua para liberar. As reservas ficam vinculadas a este navegador.</p>
+
+<div class="card top">
+  <label for="nome">Nome do formando</label>
+  <input id="nome" autocomplete="off" placeholder="Nome completo do formando">
+  <div class="cnt">
+    <span class="pill" id="cp">Pais: <b>0</b>/2</span>
+    <span class="pill" id="cc">Convidados: <b>0</b>/13</span>
+  </div>
+  <div id="mine"></div>
+  <div id="msg">Carregando…</div>
+</div>
+
+<div class="card leg">
+  <span><i style="background:var(--free);border:1px solid var(--freeb)"></i>Livre</span>
+  <span><i style="background:var(--mine)"></i>Sua escolha</span>
+  <span><i style="background:var(--taken)"></i>Ocupada</span>
+  <span><i style="background:var(--hon)"></i>Homenageados (reservadas)</span>
+</div>
+
+<h2>Pais — 2 cadeiras por formando</h2>
+<p class="sec-note">Em frente ao palco, fileiras 1 a 5. Cadeiras 1–130.</p>
+<div class="card scroll"><div class="stage">PALCO</div><div id="front"></div></div>
+
+<h2>Convidados — 13 cadeiras por formando</h2>
+<p class="sec-note">Quatro blocos atrás da seção de pais. Cadeiras 147–1050.</p>
+<div class="card scroll"><div class="blocks" id="blocks"></div></div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import {getFirestore,collection,doc,onSnapshot,runTransaction} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import {getAuth,signInAnonymously,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+const app=initializeApp({apiKey:"AIzaSyDvo0w0cX6kP4vwuCrqRE2oxx6xKj5hJUM",authDomain:"formatura-53-cadeiras.firebaseapp.com",projectId:"formatura-53-cadeiras",storageBucket:"formatura-53-cadeiras.firebasestorage.app",messagingSenderId:"594203584910",appId:"1:594203584910:web:3b2e2e930d5f7ef0b45cdf"});
+const db=getFirestore(app),auth=getAuth(app),seats=collection(db,'seats');
+const LIM={p:2,c:13},els=new Map(),info=new Map();
+let taken=new Map(),user=null,ready=false,busy=false;
+const $=s=>document.querySelector(s);
+const keyOf=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+const say=t=>{$('#msg').textContent=t||''};
+function mk(n,sec,where){const b=document.createElement('button');b.className='s'+(sec==='h'?' h':'');b.textContent=n;b.type='button';info.set(n,{sec,where});els.set(n,b);b.title='Cadeira '+n+' — '+where;b.addEventListener('click',()=>pick(n));return b}
+function range(a,b){return Array.from({length:b-a+1},(_,i)=>a+i)}
+function half(cls,nums,sec,where){const d=document.createElement('div');d.className='half '+cls;nums.forEach(n=>d.appendChild(mk(n,typeof sec==='function'?sec(n):sec,where)));return d}
+function rowEl(label,l,r){const d=document.createElement('div');d.className='row';const a=document.createElement('span');a.className='rl';a.textContent=label;const g=document.createElement('span');g.className='aisle';d.append(a,l,g,r);return d}
+function build(){const F=$('#front'),hs=n=>n>=131&&n<=146?'h':'p';const rows=[[[...range(1,7),...range(131,138)],[...range(139,146),...range(8,14)]],[range(15,29),range(30,44)],[range(45,59),range(60,74)],[range(75,89),range(90,104)],[range(105,117),range(118,130)]];rows.forEach((r,i)=>F.appendChild(rowEl(i+1,half('l',r[0],hs,'Pais, fileira '+(i+1)),half('r',r[1],hs,'Pais, fileira '+(i+1)))));const B=$('#blocks');for(let b=0;b<4;b++){const w=document.createElement('div');w.innerHTML='<div class="bt">Bloco '+(b+1)+'</div>';for(let r=1;r<=15;r++){const start=147+226*b+(r-1)*15,cnt=r===15?16:15,d=document.createElement('div');d.className='row';const a=document.createElement('span');a.className='rl';a.textContent=r;d.append(a,half('',range(start,start+cnt-1),'c','Convidados, bloco '+(b+1)+', fileira '+r));w.appendChild(d)}B.appendChild(w)}}
+function paint(){const cnt={p:0,c:0},mine=[];els.forEach((b,n)=>{const i=info.get(n);if(i.sec==='h')return;const t=taken.get(n),own=t&&user&&t.uid===user.uid;b.className='s'+(t?(own?' m':' t'):'');b.title='Cadeira '+n+' — '+i.where+(t?' — ocupada':'');if(own){cnt[i.sec]++;mine.push(n)}});$('#cp').innerHTML='Pais: <b>'+cnt.p+'</b>/2';$('#cc').innerHTML='Convidados: <b>'+cnt.c+'</b>/13';mine.sort((a,b)=>a-b);$('#mine').textContent=mine.length?'Suas cadeiras neste dispositivo: '+mine.join(', '):''}
+async function pick(n){const i=info.get(n);if(i.sec==='h'||busy)return;if(!ready||!user){say('Aguarde a conexão com o banco.');return}const nome=$('#nome').value.trim();if(!nome){say('Digite o nome do formando.');$('#nome').focus();return}if(nome.length>120){say('Nome muito longo.');return}const uid=user.uid,ref=doc(seats,String(n)),existing=taken.get(n);if(existing&&existing.uid!==uid){say('Esta cadeira já está ocupada.');return}let count=0;taken.forEach((v,m)=>{if(v.uid===uid&&info.get(m)?.sec===i.sec)count++});if(!existing&&count>=LIM[i.sec]){say('Limite atingido para este setor.');return}busy=true;say('Salvando...');try{await runTransaction(db,async tx=>{const snap=await tx.get(ref);if(snap.exists()){if(snap.data().uid!==uid)throw Error('Esta cadeira já está ocupada.');tx.delete(ref)}else{tx.set(ref,{n,uid,nome,sec:i.sec,key:keyOf(nome)})}});say(existing?'Cadeira liberada.':'Cadeira reservada!')}catch(e){say(e.message?.includes('permission')?'Operação bloqueada pelas regras do Firestore.':(e.message||'Não foi possível salvar.'))}finally{busy=false}}
+build();try{const s=localStorage.getItem('nome');if(s)$('#nome').value=s}catch(e){}$('#nome').addEventListener('input',()=>{try{localStorage.setItem('nome',$('#nome').value)}catch(e){}paint()});
+onAuthStateChanged(auth,u=>{user=u;if(u){onSnapshot(seats,snap=>{const m=new Map();snap.docs.forEach(d=>m.set(Number(d.id),d.data()));taken=m;ready=true;say('');paint()},()=>say('Erro ao carregar as reservas. Confira as regras do Firestore.'))}else{signInAnonymously(auth).catch(()=>say('Ative a autenticação anônima no Firebase.'))}});
+</script>
+</body>
+</html>
